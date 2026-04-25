@@ -149,3 +149,15 @@ This allows the decompressor to identify and validate the format without file ex
 | [pako](https://github.com/nodeca/pako) | 2.1.0 | Inflate fallback |
 
 All libraries are included locally — no CDN calls at runtime.
+
+## Team Contribution
+
+|  Name | Project Contribution |
+|--------|-----------|
+| Ankit  | 16.66% |
+| Aryan  | 16.66% | 
+| Arko   | 16.66% | 
+| Anish  | 16.66% | 
+| Aarush | 16.66% | 
+| Aniket | 16.66% | 
+
