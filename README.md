@@ -150,7 +150,8 @@ This allows the decompressor to identify and validate the format without file ex
 
 All libraries are included locally — no CDN calls at runtime.
 
-## Team Contribution
+## Team Contribution - Thirsty Labours
+Team Thirsty Labours is a collaborative group of six members—Ankit, Aryan, Arko, Anish, Aarush, and Aniket—who contributed equally to the successful completion of this project. Each member played an active role across various stages, including planning, development, testing, and documentation
 
 |  Name | Project Contribution |
 |--------|-----------|
