@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CompressKit</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="1" y="1" width="20" height="20" rx="4" stroke="#4f8ef7" stroke-width="1.5"/>
+            <path d="M6 11h10M11 6v10" stroke="#4f8ef7" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 8l4-3 4 3M7 14l4 3 4-3" stroke="#4f8ef7" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand">CompressKit</span>
+      </div>
+      <div class="version-badge">v1.0</div>
+    </header>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-compress" data-mode="compress">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M3 4l3.5-3 3.5 3M3 9l3.5 3 3.5-3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Compress
+      </button>
+      <button class="mode-btn" id="btn-decompress" data-mode="decompress">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M3 3.5l3.5 3 3.5-3M3 9.5l3.5-3 3.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Decompress
+      </button>
+    </div>
+
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" class="file-input" />
+      <div class="drop-content" id="drop-content">
+        <div class="drop-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M16 4v18M9 11l7-7 7 7" stroke="#4f8ef7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 24h20" stroke="#4f8ef7" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+        </div>
+        <p class="drop-label">Drop file here or <span class="drop-link">browse</span></p>
+        <p class="drop-sub">TXT · PNG · JPEG · WAV · MP4</p>
+      </div>
+      <div class="file-selected" id="file-selected" style="display:none;">
+        <div class="file-icon" id="file-icon">📄</div>
+        <div class="file-info">
+          <p class="file-name" id="file-name">filename.txt</p>
+          <p class="file-size" id="file-size">0 KB</p>
+        </div>
+        <button class="clear-btn" id="clear-btn" title="Clear">✕</button>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+      <!-- JPEG Quality (shown only for JPEG) -->
+      <div class="setting-row" id="jpeg-quality-row" style="display:none;">
+        <label class="setting-label">JPEG Quality</label>
+        <div class="slider-wrap">
+          <input type="range" id="jpeg-quality" min="1" max="100" value="85" class="slider" />
+          <span class="slider-val" id="jpeg-quality-val">85</span>
+        </div>
+      </div>
+      <!-- MP4 Bitrate (shown only for video) -->
+      <div class="setting-row" id="mp4-bitrate-row" style="display:none;">
+        <label class="setting-label">Target Bitrate (kbps)</label>
+        <div class="slider-wrap">
+          <input type="range" id="mp4-bitrate" min="200" max="4000" value="800" step="100" class="slider" />
+          <span class="slider-val" id="mp4-bitrate-val">800k</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <button class="action-btn" id="action-btn" disabled>
+      <span class="action-icon">⚡</span>
+      <span class="action-text" id="action-text">Select a file first</span>
+    </button>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-wrap" style="display:none;">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <p class="progress-label" id="progress-label">Processing...</p>
+    </div>
+
+    <!-- Results -->
+    <div class="results" id="results" style="display:none;">
+      <div class="results-header">
+        <span class="results-title">Results</span>
+        <span class="results-badge" id="results-badge">Lossless</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="metric-original">—</div>
+          <div class="metric-label">Original</div>
+        </div>
+        <div class="metric-card highlight">
+          <div class="metric-value" id="metric-compressed">—</div>
+          <div class="metric-label">Compressed</div>
+        </div>
+        <div class="metric-card accent">
+          <div class="metric-value" id="metric-ratio">—</div>
+          <div class="metric-label">Ratio</div>
+        </div>
+        <div class="metric-card accent">
+          <div class="metric-value" id="metric-savings">—</div>
+          <div class="metric-label">Saved</div>
+        </div>
+      </div>
+
+      <!-- Hash Verification -->
+      <div class="hash-row" id="hash-row" style="display:none;">
+        <div class="hash-icon" id="hash-icon">🔒</div>
+        <div class="hash-info">
+          <p class="hash-label">SHA-256 Verification</p>
+          <p class="hash-val" id="hash-val">—</p>
+        </div>
+        <div class="hash-status" id="hash-status">—</div>
+      </div>
+
+      <!-- Quality Note (lossy) -->
+      <div class="quality-note" id="quality-note" style="display:none;">
+        <span class="quality-icon">ℹ️</span>
+        <p class="quality-text" id="quality-text">Lossy compression applied. Visual fidelity maintained within acceptable range.</p>
+      </div>
+
+      <!-- Algorithm Info -->
+      <div class="algo-row">
+        <span class="algo-label">Algorithm:</span>
+        <span class="algo-val" id="algo-val">—</span>
+        <span class="algo-type" id="algo-type">—</span>
+      </div>
+
+      <!-- Download -->
+      <button class="download-btn" id="download-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v9M3.5 7l3.5 3 3.5-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Download Output
+      </button>
+    </div>
+
+    <!-- Session History -->
+    <div class="history-section" id="history-section" style="display:none;">
+      <div class="history-header">
+        <span class="history-title">Session History</span>
+        <button class="history-clear-btn" id="history-clear-btn">Clear</button>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>SHA-256 verified · Browser-native · No uploads</span>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="lib/fflate.min.js"></script>
+  <script src="lib/UPNG.min.js"></script>
+  <script src="lib/pako.min.js"></script>
+  <script src="hash.js"></script>
+  <script src="metrics.js"></script>
+  <script src="compression.js"></script>
+  <script src="decompression.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
